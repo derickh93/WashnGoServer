@@ -13,6 +13,9 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require("twilio")(accountSid, authToken);
 
+var distDir = __dirname + "/server/";
+app.use(express.static(distDir));
+
 ////////////////////////////////////////////////////////
 app.post("/twilio-message", cors(), async (req, res) => {
   try {

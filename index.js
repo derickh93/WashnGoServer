@@ -103,7 +103,7 @@ app.post("/create-customer-portal-session", cors(), async (req, res) => {
     console.log(cid);
     const session = await stripe.billingPortal.sessions.create({
       customer: cid,
-      return_url: "https://localhost:3000",
+      return_url: "https://wash-and-go.herokuapp.com/",
     });
 
     //res.redirect(session.url);

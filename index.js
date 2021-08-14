@@ -63,9 +63,9 @@ app.post("/payment", cors(), async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log("Error", error);
+    console.log("*****Error*****", error);
     res.json({
-      message: "Payment failed",
+      message: error.message,
       success: false,
     });
   }
@@ -218,8 +218,21 @@ app.post("/get-cards", cors(), async (req, res) => {
 async function invoiceItem(custID) {
   await stripe.invoiceItems.create({
     customer: custID,
-    price: "price_1JJoJOEkFqXnuEeNweXUvsf4",
+    price: "price_1JOPS6EkFqXnuEeN7d2ED4ZE",
+    discounts: [
+      {
+        coupon: "xZrplCOM",
+      },
+    ],
   });
+}
+
+async function createInvoice(custID, md) {
+  const invoice = await stripe.invoices.create({
+    customer: custID,
+    metadata: md,
+  });
+  return invoice;
 }
 //////////////////////////////////////////////////////
 
@@ -228,17 +241,13 @@ app.post("/create-invoice", cors(), async (req, res) => {
   try {
     let { custID, md } = req.body;
     console.log(custID);
-    invoiceItem(custID);
-
-    const invoice = await stripe.invoices.create({
-      customer: custID,
-      metadata: md,
-    });
-
-    res.json({
-      message: "cards retrieved",
-      success: true,
-      result: invoice,
+    invoiceItem(custID).then(() => {
+      const invoice = createInvoice(custID, md);
+      res.json({
+        message: "cards retrieved",
+        success: true,
+        result: invoice,
+      });
     });
   } catch (error) {
     console.log("Error", error);

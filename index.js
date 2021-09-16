@@ -218,10 +218,10 @@ app.post("/get-cards", cors(), async (req, res) => {
 async function invoiceItem(custID) {
   await stripe.invoiceItems.create({
     customer: custID,
-    price: "price_1JXHTHHoaCWF2X269XHrvfL9",
+    price: process.env.STRIPE_PRICE,
     discounts: [
       {
-        coupon: "AzbnGhBG",
+        coupon: process.env.STRIPE_COUPON,
       },
     ],
   });

@@ -258,6 +258,38 @@ app.post("/create-invoice", cors(), async (req, res) => {
   }
 });
 /////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
+app.post("/get-promos", cors(), async (req, res) => {
+  try {
+    let { pCode } = req.body;
+    const promotionCodes = await stripe.promotionCodes.list({});
+    res.json({
+      message: "promos retrieved",
+      success: true,
+      result: promotionCodes,
+    });
+    validatePromo(promotionCodes.data, pCode);
+  } catch (error) {
+    console.log("Error", error);
+    res.json({
+      message: "promos not retrieved",
+      success: false,
+    });
+  }
+});
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+async function validatePromo(arr, pCode) {
+  for (let i = 0; i < arr.length; i++) {
+    if (pCode === arr[i].code) {
+      console.log("Coupon Applied");
+      console.log(arr[i].id);
+    }
+  }
+}
+/////////////////////////////////////////////////
 app.listen(process.env.PORT || 4000, () => {
   console.log("Sever is listening on port 4000");
 });

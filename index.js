@@ -227,10 +227,17 @@ async function invoiceItem(custID) {
   });
 }
 
-async function createInvoice(custID, md) {
+async function createInvoice(custID, md, promoID) {
+  console.log("Promo ID: " + promoID);
+
   const invoice = await stripe.invoices.create({
     customer: custID,
     metadata: md,
+    discounts: [
+      {
+        coupon: promoID,
+      },
+    ],
   });
   return invoice;
 }
@@ -239,10 +246,10 @@ async function createInvoice(custID, md) {
 //////////////////////////////////////////////////
 app.post("/create-invoice", cors(), async (req, res) => {
   try {
-    let { custID, md } = req.body;
+    let { custID, md, promoID } = req.body;
     console.log(custID);
     invoiceItem(custID).then(() => {
-      const invoice = createInvoice(custID, md);
+      const invoice = createInvoice(custID, md, promoID);
       res.json({
         message: "cards retrieved",
         success: true,
@@ -264,16 +271,16 @@ app.post("/get-promos", cors(), async (req, res) => {
   try {
     let { pCode } = req.body;
     const promotionCodes = await stripe.promotionCodes.list({});
+    const id = await validatePromo(promotionCodes.data, pCode);
     res.json({
       message: "promos retrieved",
       success: true,
-      result: promotionCodes,
+      result: id,
     });
-    validatePromo(promotionCodes.data, pCode);
   } catch (error) {
-    console.log("Error", error);
+    console.log("coupon not valid");
     res.json({
-      message: "promos not retrieved",
+      message: "Coupon not valid",
       success: false,
     });
   }
@@ -285,9 +292,11 @@ async function validatePromo(arr, pCode) {
   for (let i = 0; i < arr.length; i++) {
     if (pCode === arr[i].code) {
       console.log("Coupon Applied");
-      console.log(arr[i].id);
+      console.log(arr[i].coupon.id);
+      return arr[i].coupon.id;
     }
   }
+  throw Error;
 }
 /////////////////////////////////////////////////
 app.listen(process.env.PORT || 4000, () => {

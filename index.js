@@ -229,16 +229,23 @@ async function invoiceItem(custID) {
 
 async function createInvoice(custID, md, promoID) {
   console.log("Promo ID: " + promoID);
-
-  const invoice = await stripe.invoices.create({
-    customer: custID,
-    metadata: md,
-    discounts: [
-      {
-        coupon: promoID,
-      },
-    ],
-  });
+  let invoice;
+  if (promoID === "" || promoID === null || promoID === "null") {
+    invoice = await stripe.invoices.create({
+      customer: custID,
+      metadata: md,
+    });
+  } else {
+    invoice = await stripe.invoices.create({
+      customer: custID,
+      metadata: md,
+      discounts: [
+        {
+          coupon: promoID,
+        },
+      ],
+    });
+  }
   return invoice;
 }
 //////////////////////////////////////////////////////

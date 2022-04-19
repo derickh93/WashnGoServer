@@ -17,6 +17,12 @@ var distDir = __dirname + "/server/";
 app.use(express.static(distDir));
 
 ////////////////////////////////////////////////////////
+app.post("/order-api", cors(), async (req, res) => {
+  console.log("order api accessed");
+});
+////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////
 app.post("/twilio-message", cors(), async (req, res) => {
   try {
     let { Message, SendTo } = req.body;
@@ -296,8 +302,13 @@ app.post("/get-promos", cors(), async (req, res) => {
 
 /////////////////////////////////////////////////
 async function validatePromo(arr, pCode) {
+  console.log(arr);
   for (let i = 0; i < arr.length; i++) {
-    if (pCode === arr[i].code) {
+    if (
+      pCode === arr[i].code &&
+      arr[i].coupon.valid &&
+      arr[i].coupon.times_redeemed == 0
+    ) {
       console.log("Coupon Applied");
       console.log(arr[i].coupon.id);
       return arr[i].coupon.id;

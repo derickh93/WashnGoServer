@@ -17,12 +17,6 @@ var distDir = __dirname + "/server/";
 app.use(express.static(distDir));
 
 ////////////////////////////////////////////////////////
-app.post("/order-api", cors(), async (req, res) => {
-  console.log("order api accessed");
-});
-////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////
 app.post("/twilio-message", cors(), async (req, res) => {
   try {
     let { Message, SendTo } = req.body;

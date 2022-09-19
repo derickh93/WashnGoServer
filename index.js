@@ -100,10 +100,10 @@ app.post("/create", cors(), async (req, res) => {
 app.post("/create-customer-portal-session", cors(), async (req, res) => {
   try {
     let { cid } = req.body;
-    console.log(cid);
+    //console.log(cid);
     const session = await stripe.billingPortal.sessions.create({
       customer: cid,
-      return_url: "https://washgolaundry.netlify.app/",
+      return_url: "https://lpnyc.netlify.app/",
     });
 
     //res.redirect(session.url);
@@ -169,7 +169,7 @@ app.post("/add-address", cors(), async (req, res) => {
 app.post("/get-customer", cors(), async (req, res) => {
   try {
     let { custID } = req.body;
-    console.log(custID);
+    //console.log(custID);
     const customer = await stripe.customers.retrieve(custID);
 
     res.json({
@@ -192,7 +192,7 @@ app.post("/get-customer", cors(), async (req, res) => {
 app.post("/get-cards", cors(), async (req, res) => {
   try {
     let { custID } = req.body;
-    console.log(custID);
+    //console.log(custID);
 
     const paymentMethods = await stripe.paymentMethods.list({
       customer: custID,
@@ -254,7 +254,7 @@ async function createInvoice(custID, md, promoID) {
 app.post("/create-invoice", cors(), async (req, res) => {
   try {
     let { custID, md, promoID } = req.body;
-    console.log(custID);
+    //console.log(custID);
     invoiceItem(custID).then(() => {
       const invoice = createInvoice(custID, md, promoID);
       res.json({
@@ -311,6 +311,34 @@ async function validatePromo(arr, pCode) {
   throw Error;
 }
 /////////////////////////////////////////////////
+
+////////////////////////////////////////////////
+app.post("/create-checkout-session", cors(), async (req, res) => {
+  let { cid } = req.body;
+  //console.log(cid);
+
+  const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+        price: "price_1JOPdlEkFqXnuEeN7pDGF2Na",
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `https://www.google.com`,
+    cancel_url: `https://www.bing.com`,
+    customer: cid,
+  });
+  res.json({
+    message: "url received",
+    success: true,
+    result: session.url,
+  });
+  //res.redirect(303, session.url);
+});
+
+////////////////////////////////////////////////
 app.listen(process.env.PORT || 4000, () => {
   console.log("Sever is listening on port 4000");
 });

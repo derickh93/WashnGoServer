@@ -103,7 +103,7 @@ app.post("/create-customer-portal-session", cors(), async (req, res) => {
     console.log(cid);
     const session = await stripe.billingPortal.sessions.create({
       customer: cid,
-      return_url: "https://washgolaundry.netlify.app/",
+      return_url: "https://lpnyc.netlify.app/",
     });
 
     //res.redirect(session.url);

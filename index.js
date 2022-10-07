@@ -99,11 +99,11 @@ app.post("/create", cors(), async (req, res) => {
 //////////////////////////////////////////////////////
 app.post("/create-customer-portal-session", cors(), async (req, res) => {
   try {
-    let { cid } = req.body;
+    let { cid,pth} = req.body;
     //console.log(cid);
     const session = await stripe.billingPortal.sessions.create({
       customer: cid,
-      return_url: "https://lpnyc.netlify.app/",
+      return_url: `http://localhost:3000/${pth}`,
     });
 
     //res.redirect(session.url);
@@ -314,21 +314,64 @@ async function validatePromo(arr, pCode) {
 
 ////////////////////////////////////////////////
 app.post("/create-checkout-session", cors(), async (req, res) => {
-  let { cid } = req.body;
-  //console.log(cid);
+  let { cid,add,mix,sep,shirt,slacks,jacket} = req.body;
+  console.log(req.body);
+  let line_items = [];
+  if(add > 0){
+    line_items.push(   {
+      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+      price: "price_1LpHU8EkFqXnuEeNBHWw9Spn",
+      quantity: add,
+    });
+  }
 
+  if(mix > 0){
+    line_items.push(     {
+      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+      price: "price_1LpHU8EkFqXnuEeNDLOKc4Hj",
+      quantity: mix,
+    });
+  }
+
+  if(sep > 0){
+    line_items.push(   {
+      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+      price: "price_1LpHU8EkFqXnuEeN9VNQTTK3",
+      quantity: sep,
+    });
+  }
+
+  if(shirt > 0){
+    line_items.push(    {
+      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+      price: "price_1LqHNjEkFqXnuEeNgeQuT2pC",
+      quantity: shirt,
+    });
+  }
+
+  if(slacks > 0){
+    line_items.push(       {
+      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+      price: "price_1LqHNjEkFqXnuEeNQUBeDcnB",
+      quantity: slacks,
+    });
+  }
+
+  if(jacket > 0){
+    line_items.push(    {
+      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+      price: "price_1LqHNjEkFqXnuEeN1WhwLKEw",
+      quantity: jacket,
+    });
+  }
   const session = await stripe.checkout.sessions.create({
-    line_items: [
-      {
-        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-        price: "price_1JOPdlEkFqXnuEeN7pDGF2Na",
-        quantity: 1,
-      },
-    ],
+    line_items: line_items,
     mode: "payment",
-    success_url: `https://www.google.com`,
-    cancel_url: `https://www.bing.com`,
+    success_url: `http://localhost:3000/thankyou`,
+    cancel_url: `http://localhost:3000/confirmation`,
     customer: cid,
+    allow_promotion_codes:true,
+
   });
   res.json({
     message: "url received",

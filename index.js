@@ -318,7 +318,7 @@ async function validatePromo(arr, pCode) {
 
 ////////////////////////////////////////////////
 app.post("/create-checkout-session", cors(), async (req, res) => {
-  let { cid,add,mix,sep,shirt,slacks,jacket} = req.body;
+  let { cid,add,mix,sep,shirt,slacks,jacket,md} = req.body;
   console.log(req.body);
   let line_items = [];
   if(add > 0){
@@ -375,6 +375,9 @@ app.post("/create-checkout-session", cors(), async (req, res) => {
     cancel_url: `http://${urlEnv}/confirmation`,
     customer: cid,
     allow_promotion_codes:true,
+    payment_intent_data:{
+      "metadata": md
+    }
 
   });
   res.json({
@@ -382,7 +385,7 @@ app.post("/create-checkout-session", cors(), async (req, res) => {
     success: true,
     result: session.url,
   });
-  //res.redirect(303, session.url);
+  console.log(session);
 });
 
 ////////////////////////////////////////////////

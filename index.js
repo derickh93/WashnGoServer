@@ -13,6 +13,10 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require("twilio")(accountSid, authToken);
 
+const urlEnv = 'localhost:3000';
+//const urlEnv = 'lpnycweb.netlify.com';
+
+
 var distDir = __dirname + "/server/";
 app.use(express.static(distDir));
 
@@ -103,7 +107,7 @@ app.post("/create-customer-portal-session", cors(), async (req, res) => {
     //console.log(cid);
     const session = await stripe.billingPortal.sessions.create({
       customer: cid,
-      return_url: `http://localhost:3000/${pth}`,
+      return_url: `http://${urlEnv}:3000/${pth}`,
     });
 
     //res.redirect(session.url);
@@ -367,8 +371,8 @@ app.post("/create-checkout-session", cors(), async (req, res) => {
   const session = await stripe.checkout.sessions.create({
     line_items: line_items,
     mode: "payment",
-    success_url: `http://localhost:3000/thankyou`,
-    cancel_url: `http://localhost:3000/confirmation`,
+    success_url: `http://${urlEnv}/thankyou`,
+    cancel_url: `http://${urlEnv}/confirmation`,
     customer: cid,
     allow_promotion_codes:true,
 

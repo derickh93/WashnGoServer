@@ -13,8 +13,8 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require("twilio")(accountSid, authToken);
 
-//const urlEnv = 'localhost:3000';
-const urlEnv = 'lpnycweb.netlify.com';
+const urlEnv = 'localhost:3000';
+//const urlEnv = 'lpnycweb.netlify.com';
 
 
 var distDir = __dirname + "/server/";
@@ -315,7 +315,13 @@ async function validatePromo(arr, pCode) {
   throw Error;
 }
 /////////////////////////////////////////////////
+////////////////////////////////////////////////
+app.post("/listProducts", cors(), async (req, res) => {
+const products = await stripe.products.list({});
+console.log(products);
+});
 
+////////////////////////////////////////////////
 ////////////////////////////////////////////////
 app.post("/create-checkout-session", cors(), async (req, res) => {
   let { cid,add,mix,sep,shirt,slacks,jacket,md} = req.body;

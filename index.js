@@ -13,8 +13,8 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require("twilio")(accountSid, authToken);
 
-const urlEnv = 'localhost:3000';
-//const urlEnv = 'lpnycweb.netlify.com';
+//const urlEnv = 'localhost:3000';
+const urlEnv = 'lpnycweb.netlify.com';
 
 
 var distDir = __dirname + "/server/";
@@ -319,61 +319,22 @@ async function validatePromo(arr, pCode) {
 app.post("/listProducts", cors(), async (req, res) => {
 const products = await stripe.products.list({});
 console.log(products);
+return products;
 });
+
+
+app.post("/listPrices", cors(), async (req, res) => {
+  const prices = await stripe.prices.list({});  
+  console.log(prices);
+  return prices;
+  });
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 app.post("/create-checkout-session", cors(), async (req, res) => {
-  let { cid,add,mix,sep,shirt,slacks,jacket,md} = req.body;
+  let { cid,md,line_items} = req.body;
   console.log(req.body);
-  let line_items = [];
-  if(add > 0){
-    line_items.push(   {
-      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-      price: "price_1LpHU8EkFqXnuEeNBHWw9Spn",
-      quantity: add,
-    });
-  }
 
-  if(mix > 0){
-    line_items.push(     {
-      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-      price: "price_1LpHU8EkFqXnuEeNDLOKc4Hj",
-      quantity: mix,
-    });
-  }
-
-  if(sep > 0){
-    line_items.push(   {
-      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-      price: "price_1LpHU8EkFqXnuEeN9VNQTTK3",
-      quantity: sep,
-    });
-  }
-
-  if(shirt > 0){
-    line_items.push(    {
-      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-      price: "price_1LqHNjEkFqXnuEeNgeQuT2pC",
-      quantity: shirt,
-    });
-  }
-
-  if(slacks > 0){
-    line_items.push(       {
-      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-      price: "price_1LqHNjEkFqXnuEeNQUBeDcnB",
-      quantity: slacks,
-    });
-  }
-
-  if(jacket > 0){
-    line_items.push(    {
-      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-      price: "price_1LqHNjEkFqXnuEeN1WhwLKEw",
-      quantity: jacket,
-    });
-  }
   const session = await stripe.checkout.sessions.create({
     line_items: line_items,
     mode: "payment",

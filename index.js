@@ -15,7 +15,6 @@ const client = require("twilio")(accountSid, authToken);
 
 const urlEnv = 'lpnycweb.netlify.com';
 
-
 var distDir = __dirname + "/server/";
 app.use(express.static(distDir));
 

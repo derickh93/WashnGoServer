@@ -217,17 +217,17 @@ app.post("/get-cards", cors(), async (req, res) => {
 ///////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////
-async function invoiceItem(custID) {
-  await stripe.invoiceItems.create({
-    customer: custID,
-    price: process.env.STRIPE_PRICE,
-    discounts: [
-      {
-        coupon: process.env.STRIPE_COUPON,
-      },
-    ],
-  });
-}
+// async function invoiceItem(custID) {
+//   await stripe.invoiceItems.create({
+//     customer: custID,
+//     price: process.env.STRIPE_PRICE,
+//     discounts: [
+//       {
+//         coupon: process.env.STRIPE_COUPON,
+//       },
+//     ],
+//   });
+// }
 
 async function createInvoice(custID, md, promoID) {
   console.log("Promo ID: " + promoID);

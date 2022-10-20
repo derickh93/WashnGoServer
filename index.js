@@ -341,7 +341,8 @@ app.post("/create-checkout-session", cors(), async (req, res) => {
     customer: cid,
     allow_promotion_codes:true,
     payment_intent_data:{
-      "metadata": md
+      "metadata": md,
+      setup_future_usage:'off_session'
     }
 
   });

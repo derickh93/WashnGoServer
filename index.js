@@ -1,13 +1,11 @@
 const express = require("express");
 const app = express();
-require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_TEST);
-const bodyParser = require("body-parser");
 const cors = require("cors");
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cors());
+const corsMiddleware = cors();
+app.use(express.json());
+app.use(corsMiddleware);
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -19,7 +17,7 @@ var distDir = __dirname + "/server/";
 app.use(express.static(distDir));
 
 ////////////////////////////////////////////////////////
-app.post("/twilio-message", cors(), async (req, res) => {
+app.post("/twilio-message", corsMiddleware, async (req, res) => {
   try {
     let { Message, SendTo } = req.body;
 
@@ -45,7 +43,7 @@ app.post("/twilio-message", cors(), async (req, res) => {
 });
 ////////////////////////////////////////////////////////
 
-app.post("/payment", cors(), async (req, res) => {
+app.post("/payment", corsMiddleware, async (req, res) => {
   let { amount, id, cid, email } = req.body;
   try {
     const payment = await stripe.paymentIntents.create({
@@ -74,7 +72,7 @@ app.post("/payment", cors(), async (req, res) => {
 });
 
 //////////////////////////////////////////////////////
-app.post("/create", cors(), async (req, res) => {
+app.post("/create", corsMiddleware, async (req, res) => {
   try {
     let { firstName, lastName, phone, email } = req.body;
     const customer = await stripe.customers.create({
@@ -99,7 +97,7 @@ app.post("/create", cors(), async (req, res) => {
 /////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////
-app.post("/create-customer-portal-session", cors(), async (req, res) => {
+app.post("/create-customer-portal-session", corsMiddleware, async (req, res) => {
   try {
     let { cid,pth} = req.body;
     //console.log(cid);
@@ -128,12 +126,10 @@ app.post("/create-customer-portal-session", cors(), async (req, res) => {
 
 ////////////////////////////////////////////////////
 
-app.post("/add-address", cors(), async (req, res) => {
+app.post("/add-address", corsMiddleware, async (req, res) => {
   try {
     let { cid, address, city, state, address2, full_name, options } = req.body;
-    const state_zip = state.split(" ");
-    console.log(state_zip);
-    console.log(options);
+    console.log(req.body);
     const customer = await stripe.customers.update(cid, {
       metadata: options,
 
@@ -143,9 +139,9 @@ app.post("/add-address", cors(), async (req, res) => {
           line1: address,
           line2: address2,
           city: city,
-          state: state_zip[1],
+          state: state,
           country: "US",
-          postal_code: state_zip[2],
+          //postal_code: state_zip[2],
         },
       },
     });
@@ -168,7 +164,7 @@ app.post("/add-address", cors(), async (req, res) => {
 
 ////////////////////////////////////////////////////
 
-app.post("/get-customer", cors(), async (req, res) => {
+app.post("/get-customer", corsMiddleware, async (req, res) => {
   try {
     let { custID } = req.body;
     //console.log(custID);
@@ -191,7 +187,7 @@ app.post("/get-customer", cors(), async (req, res) => {
 
 ////////////////////////////////////////////////////
 
-app.post("/get-cards", cors(), async (req, res) => {
+app.post("/get-cards", corsMiddleware, async (req, res) => {
   try {
     let { custID } = req.body;
     //console.log(custID);
@@ -253,7 +249,7 @@ async function createInvoice(custID, md, promoID) {
 //////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
-app.post("/create-invoice", cors(), async (req, res) => {
+app.post("/create-invoice", corsMiddleware, async (req, res) => {
   try {
     let { custID, md, promoID } = req.body;
     //console.log(custID);
@@ -276,7 +272,7 @@ app.post("/create-invoice", cors(), async (req, res) => {
 /////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
-app.post("/get-promos", cors(), async (req, res) => {
+app.post("/get-promos", corsMiddleware, async (req, res) => {
   try {
     let { pCode } = req.body;
     const promotionCodes = await stripe.promotionCodes.list({});
@@ -314,14 +310,14 @@ async function validatePromo(arr, pCode) {
 }
 /////////////////////////////////////////////////
 ////////////////////////////////////////////////
-app.post("/listProducts", cors(), async (req, res) => {
+app.post("/listProducts", corsMiddleware, async (req, res) => {
 const products = await stripe.products.list({});
 console.log(products);
 return products;
 });
 
 
-app.post("/listPrices", cors(), async (req, res) => {
+app.post("/listPrices", corsMiddleware, async (req, res) => {
   const prices = await stripe.prices.list({});  
   console.log(prices);
   return prices;
@@ -329,7 +325,7 @@ app.post("/listPrices", cors(), async (req, res) => {
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-app.post("/create-checkout-session", cors(), async (req, res) => {
+app.post("/create-checkout-session", corsMiddleware, async (req, res) => {
   let { cid,md,line_items} = req.body;
   console.log(req.body);
 

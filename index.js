@@ -1,13 +1,12 @@
 const express = require("express");
+require('express-async-errors');
 const app = express();
-require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_TEST);
-const bodyParser = require("body-parser");
 const cors = require("cors");
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cors());
+const corsMiddleware = cors();
+app.use(express.json());
+app.use(corsMiddleware);
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -18,7 +17,7 @@ const urlEnv = 'lpnycweb.netlify.com';
 var distDir = __dirname + "/server/";
 app.use(express.static(distDir));
 
-app.post("/twilio-message", cors(), async (req, res) => {
+app.post("/twilio-message", corsMiddleware, async (req, res) => {
   try {
     let { Message, SendTo } = req.body;
 
@@ -43,7 +42,7 @@ app.post("/twilio-message", cors(), async (req, res) => {
   }
 });
 
-app.post("/create", cors(), async (req, res) => {
+app.post("/create", corsMiddleware, async (req, res) => {
   try {
     let { firstName, lastName, phone, email } = req.body;
     const customer = await stripe.customers.create({
@@ -66,7 +65,7 @@ app.post("/create", cors(), async (req, res) => {
   }
 });
 
-app.post("/add-address", cors(), async (req, res) => {
+app.post("/add-address", corsMiddleware, async (req, res) => {
   try {
     let { cid, address, city, state, address2, full_name, options } = req.body;
     console.log(req.body);
@@ -101,7 +100,7 @@ app.post("/add-address", cors(), async (req, res) => {
   }
 });
 
-app.post("/get-customer", cors(), async (req, res) => {
+app.post("/get-customer", corsMiddleware, async (req, res) => {
   try {
     let { custID } = req.body;
     console.log(custID);
@@ -121,20 +120,20 @@ app.post("/get-customer", cors(), async (req, res) => {
   }
 });
 
-app.post("/listProducts", cors(), async (req, res) => {
+app.post("/listProducts", corsMiddleware, async (req, res) => {
 const products = await stripe.products.list({});
 console.log(products);
 return products;
 });
 
 
-app.post("/listPrices", cors(), async (req, res) => {
+app.post("/listPrices", corsMiddleware, async (req, res) => {
   const prices = await stripe.prices.list({});  
   console.log(prices);
   return prices;
   });
 
-app.post("/create-checkout-session", cors(), async (req, res) => {
+app.post("/create-checkout-session", corsMiddleware, async (req, res) => {
   let { cid,md,line_items} = req.body;
   console.log(req.body);
 

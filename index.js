@@ -1,4 +1,5 @@
 const express = require("express");
+require('express-async-errors');
 const app = express();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_TEST);
 const cors = require("cors");
@@ -102,7 +103,7 @@ app.post("/add-address", corsMiddleware, async (req, res) => {
 app.post("/get-customer", corsMiddleware, async (req, res) => {
   try {
     let { custID } = req.body;
-    //console.log(custID);
+    console.log(custID);
     const customer = await stripe.customers.retrieve(custID);
 
     res.json({

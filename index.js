@@ -1,8 +1,9 @@
 const express = require("express");
-require('express-async-errors');
+require("express-async-errors");
 const app = express();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_TEST);
 const cors = require("cors");
+const axios = require("axios");
 
 const corsMiddleware = cors();
 app.use(express.json());
@@ -67,7 +68,8 @@ app.post("/create", corsMiddleware, async (req, res) => {
 
 app.post("/add-address", corsMiddleware, async (req, res) => {
   try {
-    let { cid, address, city, state, address2, full_name, options } = req.body;
+    let { cid, address, city, state, address2, full_name, options, phone,zip} =
+      req.body;
     console.log(req.body);
     const customer = await stripe.customers.update(cid, {
       metadata: options,
@@ -80,8 +82,9 @@ app.post("/add-address", corsMiddleware, async (req, res) => {
           city: city,
           state: state,
           country: "US",
-          //postal_code: state_zip[2],
+          postal_code: zip,
         },
+        phone,
       },
     });
 
@@ -121,20 +124,51 @@ app.post("/get-customer", corsMiddleware, async (req, res) => {
 });
 
 app.post("/listProducts", corsMiddleware, async (req, res) => {
-const products = await stripe.products.list({});
-console.log(products);
-return products;
+  const products = await stripe.products.list({});
+  console.log(products);
+  return products;
 });
 
-
 app.post("/listPrices", corsMiddleware, async (req, res) => {
-  const prices = await stripe.prices.list({});  
+  const prices = await stripe.prices.list({});
   console.log(prices);
   return prices;
-  });
+});
+
+function encode(array, ...splat) {
+  let str = "";
+  for (let i = 0; i < array.length; i++) {
+    str += array[i];
+    if (i < splat.length) {
+      str += encodeURIComponent(splat[i]);
+    }
+  }
+  return str;
+}
+
+app.post("/getZipCode", corsMiddleware, async (req, res) => {
+  let { placesID } = req.body;
+  try {
+    const result = await axios.get(
+      encode`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placesID}&key=${process.env.GOOGLE_API_KEY}`
+    );
+
+    res.json({
+      message: "Zip code retrieved",
+      success: true,
+      result: result.data,
+    });
+  } catch (error) {
+    console.log("Error", error);
+    res.json({
+      message: "Zip code not retrieved",
+      success: false,
+    });
+  }
+});
 
 app.post("/create-checkout-session", corsMiddleware, async (req, res) => {
-  let { cid,md,line_items} = req.body;
+  let { cid, md, line_items } = req.body;
   console.log(req.body);
 
   const session = await stripe.checkout.sessions.create({
@@ -143,12 +177,11 @@ app.post("/create-checkout-session", corsMiddleware, async (req, res) => {
     success_url: `http://${urlEnv}/thankyou`,
     cancel_url: `http://${urlEnv}/confirmation`,
     customer: cid,
-    allow_promotion_codes:true,
-    payment_intent_data:{
-      "metadata": md,
-      setup_future_usage:'off_session'
-    }
-
+    allow_promotion_codes: true,
+    payment_intent_data: {
+      metadata: md,
+      setup_future_usage: "off_session",
+    },
   });
   res.json({
     message: "url received",

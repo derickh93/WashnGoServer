@@ -13,10 +13,39 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require("twilio")(accountSid, authToken);
 
-const urlEnv = 'lpdayweb.netlify.com';
+const urlEnv = "localhost:3000";
 
 var distDir = __dirname + "/server/";
 app.use(express.static(distDir));
+
+
+
+app.post("/service-area", corsMiddleware, async (req, res) => {
+  try {
+    let { zipCode } = req.body;
+    console.log(req.body);
+    console.log(included)
+    if (included) {
+      res.json({
+        message: "We service your area",
+        success: true,
+        result: true,
+      });
+    } else {
+      res.json({
+        message: "Unfortunately we are not in your area yet",
+        success: true,
+        result: false,
+      });
+    }
+  } catch (error) {
+    console.log("Error", error);
+    res.json({
+      message: "zip code not found",
+      success: false,
+    });
+  }
+});
 
 app.post("/twilio-message", corsMiddleware, async (req, res) => {
   try {
@@ -66,10 +95,39 @@ app.post("/create", corsMiddleware, async (req, res) => {
   }
 });
 
+app.post("/create-guest", corsMiddleware, async (req, res) => {
+  try {
+    let { email,zip} = req.body;
+    const customer = await stripe.customers.create({
+      email: email,
+    });
+    res.json({
+      message: "Payment successful",
+      stripeCust: customer,
+      success: true,
+    });
+  } catch (error) {
+    console.log("Error", error);
+    res.json({
+      message: "Payment failed",
+      success: false,
+    });
+  }
+});
+
 app.post("/add-address", corsMiddleware, async (req, res) => {
   try {
-    let { cid, address, city, state, address2, full_name, options, phone,zip} =
-      req.body;
+    let {
+      cid,
+      address,
+      city,
+      state,
+      address2,
+      full_name,
+      options,
+      phone,
+      zip,
+    } = req.body;
     console.log(req.body);
     const customer = await stripe.customers.update(cid, {
       metadata: options,

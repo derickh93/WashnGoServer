@@ -15,7 +15,7 @@ const client = require("twilio")(accountSid, authToken);
 
 const urlEnv = "stalbanslaundryschedule.netlify.app";
 
-var distDir = __dirname ;
+var distDir = __dirname + "/server/";
 app.use(express.static(distDir));
 
 

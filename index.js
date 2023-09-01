@@ -13,7 +13,7 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require("twilio")(accountSid, authToken);
 
-const urlEnv = "stalbanslaundryschedule.netlify.app";
+const urlEnv = "lpdayweb.netlify.app";
 
 var distDir = __dirname + "/server/";
 app.use(express.static(distDir));

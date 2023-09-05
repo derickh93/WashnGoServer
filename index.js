@@ -13,7 +13,7 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require("twilio")(accountSid, authToken);
 
-const urlEnv = "lpdayweb.netlify.app";
+const urlEnv = process.env.URL_FRONTEND
 
 var distDir = __dirname + "/server/";
 app.use(express.static(distDir));
@@ -232,8 +232,8 @@ app.post("/create-checkout-session", corsMiddleware, async (req, res) => {
   const session = await stripe.checkout.sessions.create({
     line_items: line_items,
     mode: "payment",
-    success_url: `https://${urlEnv}/thankyou`,
-    cancel_url: `https://${urlEnv}/confirmation`,
+    success_url: `${urlEnv}/thankyou`,
+    cancel_url: `${urlEnv}/confirmation`,
     customer: cid,
     allow_promotion_codes: true,
     payment_intent_data: {
